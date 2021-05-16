@@ -25,6 +25,8 @@ boolean   --> [264].
 id        --> [270].
 assign_op --> [271].  
 number    --> [272].
+undefined --> [273].
+/*EOF       --> [275].*/
 
 lp        --> [40].
 rp        --> [41].
@@ -96,6 +98,10 @@ operand     --> number.
 /* The Lexical Analyser                                                       */
 /******************************************************************************/
 
+test_lexer(File, X) :- read_in(File, L), lexer(L, X), write(X).
+
+
+
 lexer([],[]).
 lexer([H|T], [F|S]) :- match(H, F), lexer(T, S).
 
@@ -141,10 +147,12 @@ match_alp([H|T]) :- char_type(H, digit), match_alp(T).   /*Viktigt kan innehåll
 /*THE READER                                                                   */
 /******************************************************************************/
 
-lab3(File, Result) :- read_in(File, L), lexer(L, Tokens), parser(Tokens, Result).
+lab3(File, Result) :- read_in(File, L), write(L), nl, 
+                      lexer(L, Tokens),  write(Tokens), nl,
+                      parser(Tokens, Result).
 
-parseFiles([]).
 /*
+parseFiles([]).
 parseFiles([H|T]) :-
    write("Testing "), write(H), nl,
    read_in(H,L), lexer(L, Tokens), parser(Tokens, Result), 
@@ -226,25 +234,63 @@ in_word(C, C) :- C>47, C<58.              /* 1 2 ... 9 */
 lastword('.').
 
 /******************************************************************************/
-/* added for demonstration purposes 140421, updated 150301                    */
-/* testa  - file input (characters + Pascal program)                          */
-/* testb  - file input as testa + output to file                              */
-/* ttrace - file input + switch on tracing (check this carefully)             */
+/* all files                                                                  */
 /******************************************************************************/
 
-testa   :- testread(['cmreader.txt', 'testok1.pas']).
-testb   :- tell('cmreader.out'), testread(['cmreader.txt', 'testok1.pas']), told.
 
-ttrace  :- trace, testread(['cmreader.txt']), notrace, nodebug.
+/*
+allfiles :- tell('parser.out') parseFiles([
 
-testread([]).
-testread([H|T]) :- nl, write('Testing C&M Reader, input file: '), write(H), nl,
-                   read_in(H,L), write(L), nl,
-                   nl, write(' end of C&M Reader test'), nl,
-                   testread(T).
+   'testfiles/testa.pas',
+   'testfiles/testb.pas',
+   'testfiles/testc.pas',
+   'testfiles/testd.pas',
+   'testfiles/teste.pas',
+   'testfiles/testf.pas',
+   'testfiles/testg.pas',
+   'testfiles/testh.pas',
+   'testfiles/testi.pas',
+   'testfiles/testj.pas',
+   'testfiles/testk.pas',
+   'testfiles/testl.pas',
+   'testfiles/testm.pas',
+   'testfiles/testn.pas',
+   'testfiles/testo.pas',
+   'testfiles/testp.pas',
+   'testfiles/testq.pas',
+   'testfiles/testr.pas',
+   'testfiles/tests.pas',
+   'testfiles/testt.pas',
+   'testfiles/testu.pas',
+   'testfiles/testv.pas',
+   'testfiles/testw.pas',
+   'testfiles/testx.pas',
+   'testfiles/testy.pas',
+   'testfiles/testz.pas',
 
-test_lexer(File, X) :- read_in(File, L), lexer(L, X), write(X).
 
+   'testfiles/testok1.pas',
+   'testfiles/testok2.pas',
+   'testfiles/testok3.pas',
+   'testfiles/testok4.pas',
+   'testfiles/testok5.pas',
+   'testfiles/testok6.pas',
+   'testfiles/testok7.pas',
+
+
+   'testfiles/fun1.pas',
+   'testfiles/fun2.pas',
+   'testfiles/fun3.pas',
+   'testfiles/fun4.pas',
+   'testfiles/fun5.pas',
+
+   'testfiles/sem1.pas',
+   'testfiles/sem2.pas',
+   'testfiles/sem3.pas',
+   'testfiles/sem4.pas',
+   'testfiles/sem5.pas'
+]), told.
+*/
 /******************************************************************************/
 /* end of program                                                             */
 /******************************************************************************/
