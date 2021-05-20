@@ -6,7 +6,7 @@
 /* The Parser                                                                 */
 /******************************************************************************/
 
-parser(Tokens, Res) :- (prog(Tokens, Res), Res = [], write('Parse Succeed!')); write(Res), nl, write('Parse Fail!').
+parser(Tokens, Res) :- (prog(Tokens, Res), Res = [], write('Parse OK!')); write('Parse Fail!').
 
 
 /******************************************************************************/
@@ -25,8 +25,7 @@ boolean   --> [264].
 id        --> [270].
 assign_op --> [271].  
 number    --> [272].
-undefined --> [273].
-/*EOF       --> [275].*/
+/*undefined --> [273].*/
 
 lp        --> [40].
 rp        --> [41].
@@ -132,10 +131,12 @@ match(L,F) :- L = ':', F is 58.
 match(L,F) :- L = '=', F is 68.
 match(L,F) :- L = '.', F is 46.
 match(L,F) :- L = ':=', F is 271.
+match(L,F) :- L = -1 , F is 275. /*EOF*/
 
 match(L, T) :- name(L,[H|Tail]), char_type(H, digit), match_num(Tail), T is 272. /* kollar numer */
 match(L, T) :- name(L,[H|Tail]), char_type(H, alpha), match_alp(Tail), T is 270. /* kollar id */
 
+match(L,F) :- L = _ , F is 273.  /*undefined*/
 
 match_num([]).
 match_num([H|T]) :- char_type(H, digit), match_num(T).
@@ -157,8 +158,8 @@ lab3(File, Result) :- read_in(File, L), write(L), nl,
 parseFiles([]).
 parseFiles([H|T]) :-
    write("Testing "), write(H), nl,
-   read_in(H,L), lexer(L, Tokens), parser(Tokens, _),  
-   nl, write(H), write(" end"), nl, nl,
+   read_in(H,L),  write(L), nl, lexer(L, Tokens),  write(Tokens), nl, parser(Tokens, _),  
+   nl,  write(H), write(" end of parse"), nl, nl,
    parseFiles(T).
 
 
@@ -241,8 +242,10 @@ lastword('.').
 
 testa :- lab3('testfiles/testok1.pas'  ,  _).
 
-allfiles :- tell('parser.out'), parseFiles([
+allfiles :- tell('parser.out'), testok, testa_z,  testfun, testsem, told.
 
+
+testok :- write('Testing OK programs '), nl, nl, parseFiles([
    
    'testfiles/testok1.pas',
    'testfiles/testok2.pas',
@@ -250,9 +253,13 @@ allfiles :- tell('parser.out'), parseFiles([
    'testfiles/testok4.pas',
    'testfiles/testok5.pas',
    'testfiles/testok6.pas',
-   'testfiles/testok7.pas',
+   'testfiles/testok7.pas'
+   ]).
 
-   /*'testfiles/testa.pas',*/
+testa_z :- write('Testing a-z programs '), nl, nl, parseFiles([
+   
+   
+   'testfiles/testa.pas',
    'testfiles/testb.pas',
    'testfiles/testc.pas',
    'testfiles/testd.pas',
@@ -277,20 +284,30 @@ allfiles :- tell('parser.out'), parseFiles([
    'testfiles/testw.pas',
    'testfiles/testx.pas',
    'testfiles/testy.pas',
-   'testfiles/testz.pas',
+   'testfiles/testz.pas'
+   
+   ]).
 
+testfun :- write('Testing fun programs '), nl, nl, parseFiles([
+   
    'testfiles/fun1.pas',
    'testfiles/fun2.pas',
    'testfiles/fun3.pas',
    'testfiles/fun4.pas',
-   'testfiles/fun5.pas',
+   'testfiles/fun5.pas'
 
+   ]).
+
+testsem :- write('Testing sem programs '), nl, nl, parseFiles([
+   
    'testfiles/sem1.pas',
    'testfiles/sem2.pas',
    'testfiles/sem3.pas',
    'testfiles/sem4.pas',
    'testfiles/sem5.pas'
-]), told.
+
+   ]).
+
 
 /******************************************************************************/
 /* end of program                                                             */
