@@ -155,7 +155,6 @@ lab3(File, Result) :- read_in(File, L), write(L), nl,
 
 
 parseFiles([]).
-
 parseFiles([H|T]) :-
    write("Testing "), write(H), nl,
    read_in(H,L), lexer(L, Tokens), parser(Tokens, _),  
