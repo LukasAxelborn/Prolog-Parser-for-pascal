@@ -6,7 +6,7 @@
 /* The Parser                                                                 */
 /******************************************************************************/
 
-parser(Tokens, Res) :- (prog(Tokens, Res), Res = [], write("Parse Succeed!")); write("Parse Fail!").
+parser(Tokens, Res) :- (prog(Tokens, Res), Res = [], write('Parse Succeed!')); write(Res), nl, write('Parse Fail!').
 
 
 /******************************************************************************/
@@ -57,12 +57,13 @@ prog_head --> program, id, lp, input, comma, output, rp, scolon.
 
 var_part      --> var, var_dec_list.
 
+var_dec_list  --> var_dec.
 var_dec_list  --> var_dec, var_dec_list.
 
-var_dec       --> id_list, id, colon, type, scolon.
+var_dec       --> id_list, colon, type, scolon.
 
+id_list       --> id.
 id_list       --> id, comma, id_list.
-
 
 /*https://stackoverflow.com/a/40682737*/
 
@@ -76,7 +77,8 @@ type          --> boolean.
 
 stat_part   --> begin, stat_list, end, punkt.
 
-stat_list   --> stat, stat_list, scolon.
+stat_list   --> stat.
+stat_list   --> stat, scolon, stat_list.
 
 stat        --> assign_stat.
 
@@ -151,14 +153,15 @@ lab3(File, Result) :- read_in(File, L), write(L), nl,
                       lexer(L, Tokens),  write(Tokens), nl,
                       parser(Tokens, Result).
 
-/*
+
 parseFiles([]).
+
 parseFiles([H|T]) :-
    write("Testing "), write(H), nl,
-   read_in(H,L), lexer(L, Tokens), parser(Tokens, Result), 
+   read_in(H,L), lexer(L, Tokens), parser(Tokens, _),  
    nl, write(H), write(" end"), nl, nl,
    parseFiles(T).
-*/
+
 
 /******************************************************************************/
 /* read in                                                                    */
@@ -237,11 +240,20 @@ lastword('.').
 /* all files                                                                  */
 /******************************************************************************/
 
+testa :- lab3('testfiles/testok1.pas'  ,  _).
 
-/*
-allfiles :- tell('parser.out') parseFiles([
+allfiles :- tell('parser.out'), parseFiles([
 
-   'testfiles/testa.pas',
+   
+   'testfiles/testok1.pas',
+   'testfiles/testok2.pas',
+   'testfiles/testok3.pas',
+   'testfiles/testok4.pas',
+   'testfiles/testok5.pas',
+   'testfiles/testok6.pas',
+   'testfiles/testok7.pas',
+
+   /*'testfiles/testa.pas',*/
    'testfiles/testb.pas',
    'testfiles/testc.pas',
    'testfiles/testd.pas',
@@ -268,16 +280,6 @@ allfiles :- tell('parser.out') parseFiles([
    'testfiles/testy.pas',
    'testfiles/testz.pas',
 
-
-   'testfiles/testok1.pas',
-   'testfiles/testok2.pas',
-   'testfiles/testok3.pas',
-   'testfiles/testok4.pas',
-   'testfiles/testok5.pas',
-   'testfiles/testok6.pas',
-   'testfiles/testok7.pas',
-
-
    'testfiles/fun1.pas',
    'testfiles/fun2.pas',
    'testfiles/fun3.pas',
@@ -290,7 +292,7 @@ allfiles :- tell('parser.out') parseFiles([
    'testfiles/sem4.pas',
    'testfiles/sem5.pas'
 ]), told.
-*/
+
 /******************************************************************************/
 /* end of program                                                             */
 /******************************************************************************/
