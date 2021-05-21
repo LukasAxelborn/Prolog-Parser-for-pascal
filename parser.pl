@@ -25,7 +25,7 @@ boolean   --> [264].
 id        --> [270].
 assign_op --> [271].  
 number    --> [272].
-/*undefined --> [273].*/
+undefined --> [273].
 
 lp        --> [40].
 rp        --> [41].
@@ -95,6 +95,7 @@ factor      --> operand.
 operand     --> id.
 operand     --> number.
 
+
 /******************************************************************************/
 /* The Lexical Analyser                                                       */
 /******************************************************************************/
@@ -128,7 +129,6 @@ match(L,F) :- L = '+', F is 43.
 match(L,F) :- L = ',', F is 44.
 match(L,F) :- L = ';', F is 59.
 match(L,F) :- L = ':', F is 58.
-match(L,F) :- L = '=', F is 68.
 match(L,F) :- L = '.', F is 46.
 match(L,F) :- L = ':=', F is 271.
 match(L,F) :- L = -1 , F is 275. /*EOF*/
@@ -192,20 +192,36 @@ readwordaux(C, W, C1, C2) :- C1 \= 61, name(W, [C]), C1=C2.
 readword(C, W, _)  :- C = -1, W = C.                    /* added EOF handling */
 readword(C, W, C2) :- C = 58, get0(C1), readwordaux(C, W, C1, C2). /* Hanmtering för ":="  */
 readword(C, W, C1) :- single_character( C ), name(W, [C]), get0(C1).
-readword(C, W, C2) :-
+
+readword(C, W, C2) :-   /* kollar om det är enbart siffror */
+    in_num(C, NewC ),
+    get0(C1),
+    restnum(C1, Cs, C2),
+    name(W, [NewC|Cs]).
+
+readword(C, W, C2) :-   /*kollar om det är boksätver och sifror*/
    in_word(C, NewC ),
    get0(C1),
    restword(C1, Cs, C2),
    name(W, [NewC|Cs]).
 
+
+
 readword(_, W, C2) :- get0(C1), readword(C1, W, C2).
 
-restword(C, [NewC|Cs], C2) :-
-   in_word(C, NewC),
+restword(C, [NewC|Cs], C2) :- /* makes a word */
+in_word(C, NewC),
+get0(C1),
+restword(C1, Cs, C2).
+
+restword(C, [], C).
+
+restnum(C, [NewC|Cs], C2) :- /* makes only a number */
+   in_num(C, NewC),
    get0(C1),
    restword(C1, Cs, C2).
 
-restword(C, [ ], C).
+restnum(C, [], C).
 
 /******************************************************************************/
 /* These characters form words on their own                                   */
@@ -216,6 +232,7 @@ single_character(41).                  /* ) */
 single_character(42).                  /* + */
 single_character(43).                  /* * */
 single_character(44).                  /* , */
+single_character(45).                  /* - */
 single_character(59).                  /* ; */
 single_character(58).                  /* : */
 single_character(61).                  /* = */
@@ -229,6 +246,8 @@ single_character(46).                  /* . */
 in_word(C, C) :- C>96, C<123.             /* a b ... z */
 in_word(C, L) :- C>64, C<91, L is C+32.   /* A B ... Z */
 in_word(C, C) :- C>47, C<58.              /* 1 2 ... 9 */
+
+in_num(C, C) :- C>47, C<58.              /* 1 2 ... 9 */
 
 /******************************************************************************/
 /* These words terminate a sentence                                           */
